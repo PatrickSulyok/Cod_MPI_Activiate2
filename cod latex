@@ -1,0 +1,380 @@
+\documentclass[12pt,a4paper]{article}
+
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[romanian]{babel}
+\usepackage{lmodern}
+\usepackage{amssymb}
+\usepackage[a4paper,margin=3cm]{geometry}
+\usepackage{url}
+
+
+\usepackage{listings}
+\usepackage{xcolor}
+
+\lstset{
+  language=Python,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{red},
+  showstringspaces=false,
+  breaklines=true,
+  frame=single,
+  tabsize=2,
+  captionpos=b
+}
+
+
+
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=black}
+
+
+\usepackage{tocloft}
+\setlength{\cftsecindent}{0pt}
+\setlength{\cftsubsecindent}{2em}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\renewcommand{\cftsubsecleader}{\cftdotfill{\cftdotsep}}
+\renewcommand{\contentsname}{Cuprins}
+
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1em}
+
+\begin{document}
+\pagenumbering{arabic}
+
+
+\begin{center}
+    {\Huge\bfseries Satisfiabilitatea ca Interes Major\par}
+    \vspace{1.8cm}
+    {\large Sulyok Patrick Fabian\\
+    Universitatea de Vest din Timișoara, Facultatea de matematică și informatică\\
+    patrick.sulyok05@e-uvt.ro}
+    
+        {\large 11.05.2025}
+\end{center}
+
+\begin{center}
+    \textbf{Rezumat}
+\end{center}
+
+\noindent
+
+
+Documentația de față oferă o privire de ansamblu asupra problemei satisfiabilității logice (SAT), una dintre cele mai fundamentale și studiate probleme din informatică teoretică. În deschidere, este prezentat un scurt istoric al problemei, incluzând faptul că SAT a fost prima problemă dovedită ca fiind NP-completă, ceea ce i-a conferit o importanță majoră în studiul complexității algoritmice.
+
+Lucrarea continuă cu descrierea conceptuală și implementarea a trei metode distincte de rezolvare a satisfiabilității: metoda rezoluției, programarea dinamică (DP) și algoritmul DPLL. Fiecare metodă este însoțită de cod Python explicat pe larg, într-un stil accesibil și clar. Se evidențiază cum fiecare tehnică tratează clauzele logice și cum reacționează în fața unor contradicții sau formule satisfiabile.
+
+Pe lângă algoritmi, documentația include și funcții auxiliare necesare pentru rularea programului, dar care nu sunt direct implicate în logica de decizie. Printre acestea, regăsim parsarea formulelor scrise de utilizator într-un format standardizat intern (CNF), precum și afișarea lizibilă a unei atribuiri valide. De asemenea, se explică pe scurt și importurile necesare pentru buna funcționare a codului (precum \texttt{defaultdict} și \texttt{typing}), alături de definirea tipurilor utilizate pentru variabile, clauze și formule.
+
+În ansamblu, documentația urmărește să ofere atât o înțelegere teoretică de bază a satisfiabilității, cât și o prezentare aplicată, completă și funcțională a implementării acesteia în Python.
+
+\newpage
+
+
+\tableofcontents
+\vspace{3em}
+
+    {\large\bfseries Declarație de Originalitate\par}
+Declar pe propria răspundere că lucrarea de față este rezultatul muncii mele personale, iar ideea generală a proiectului îmi aparține. Toate sursele de informare, inspirație sau citate utilizate în redactarea documentației și în realizarea codului au fost menționate corespunzător în bibliografie sau în notele explicative.
+
+Proiectul respectă normele de etică și integritate academică, iar orice contribuție externă, dacă a existat, a fost clar specificată. Nu am plagiat și nu am transmis lucrarea sub semnătura altcuiva.
+\newpage
+
+
+
+
+\section{Introducere}
+Satisfiabilitatea logică, adesea abreviată SAT (de la Satisfiability), este o problemă fundamentală în domeniul informaticii teoretice, al logicii matematice și al inteligenței artificiale. În esență, problema SAT se referă la determinarea posibilității de a atribui valori de adevăr (adevărat sau fals) unor variabile logice astfel încât o formulă booleană să fie adevărată.
+
+Pentru a înțelege mai bine, să ne imaginăm că avem o formulă logică compusă din mai multe variabile și conectivi logici (precum „și”, „sau”, „nu”). Problema satisfiabilității ne întreabă: există vreo combinație de valori (true/false) pentru variabilele din formulă care face ca întreaga formulă să fie adevărată? Dacă da, spunem că formula este satisfiabilă. Dacă nu există nicio astfel de combinație, formula este nesatisfiabilă.
+
+\subsection{O scurtă istorie}
+Deși pare simplă, această problemă are implicații uriașe. Satisfiabilitatea este prima problemă dovedită a fi NP-completă (prin teorema lui Cook în 1971), ceea ce înseamnă că este una dintre cele mai importante și studiate probleme din teoria complexității. Orice problemă din clasa NP se poate reduce la SAT, ceea ce face ca algoritmii care o rezolvă eficient să fie de interes major.
+
+De-a lungul anilor, au fost dezvoltate multiple metode pentru a rezolva problema satisfiabilității, fie prin metode teoretice, fie prin algoritmi practici utilizați în verificarea de programe, inteligență artificială, planificare automată și multe altele. Dintre cele mai cunoscute abordări se numără:
+
+\textbf{Metoda rezoluției}, un procedeu logic bazat pe inferență;
+
+
+\textbf{Algoritmul DPLL (Davis–Putnam–Logemann–Loveland)}, o abordare recursivă bazată pe backtracking;
+
+\textbf{Dynamic Programming (DP)} aplicat în contexte specifice de satisfiabilitate restrânsă.
+
+
+
+\section{Cod pentru stabilirea satisfiabilității}
+În cadrul acestui proiect am dezvoltat un program care oferă un meniu interactiv, conceput special pentru utilizatorii începători. Acesta permite introducerea unor clauze logice de la tastatură și verifică satisfiabilitatea acestora folosind trei metode diferite: rezoluția, programarea dinamică (DP) și algoritmul DPLL (Davis–Putnam–Logemann–Loveland). Codul complet poate fi consultat accesând linkul de mai jos:
+
+\url{https://github.com/PatrickSulyok/Cod_MPI_Activiate2}
+
+\subsection{Metoda I - Metoda rezoluției}
+\begin{lstlisting}[caption={Implementarea metodei rezoluției pentru satisfiabilitate}]
+def resolution_refutation(clauses: CNF) -> bool:
+    new = set()
+    clauses = [tuple(c) for c in clauses]
+    while True:
+        n = len(clauses)
+        for i in range(n):
+            for j in range(i+1, n):
+                ci, cj = clauses[i], clauses[j]
+                for lit in ci:
+                    if -lit in cj:
+                        resolvent = tuple(sorted(set(ci) | set(cj) - {lit, -lit}))
+                        if not resolvent:
+                            return False   
+                        new.add(resolvent)
+        if new.issubset(set(clauses)):
+            return True       
+        for c in new:
+            if c not in clauses:
+                clauses.append(c)
+\end{lstlisting}
+
+Funcția \texttt{resolution\_refutation} primește ca parametru o formulă logică exprimată în forma conjunctivă normală (CNF), reprezentată ca o listă de clauze, unde fiecare clauză este la rândul ei o listă de literali (numere întregi – pozitive pentru variabile, negative pentru negațiile acestora).
+
+La începutul funcției, este inițializată o mulțime goală numită \texttt{new}, care va conține noile clauze obținute în urma procesului de rezoluție. Această mulțime are rolul de a urmări dacă se generează clauze noi sau dacă s-a ajuns la o stare stabilă, unde nu se mai poate deduce nimic nou.
+
+Apoi, toate clauzele primite sunt transformate în tupluri, pentru a le putea stoca într-un \texttt{set} (deoarece listele nu sunt hashabile, dar tuplurile sunt). Aceasta este o conversie utilă pentru a putea lucra cu ele eficient în mulțimi și pentru a evita duplicatele.
+
+Intrăm apoi într-o buclă infinită \texttt{while True}, care va rula până când ajungem la o concluzie: fie găsim o contradicție (adică clauza vidă), fie nu se mai pot deduce clauze noi.
+
+În interiorul buclei, se reține numărul de clauze actuale în variabila \texttt{n}, pentru a parcurge toate perechile posibile de clauze existente.
+
+Urmează două bucle imbricate \texttt{for}, care aleg fiecare pereche posibilă de clauze distincte (\texttt{ci}, \texttt{cj}) din lista existentă. Se asigură că nu comparăm o clauză cu ea însăși și nici perechi deja procesate în ordine inversă.
+
+Pentru fiecare pereche de clauze (\texttt{ci}, \texttt{cj}), se caută literali opuși între cele două. Dacă un literal \texttt{lit} apare în \texttt{ci}, iar opusul său \texttt{-lit} apare în \texttt{cj}, înseamnă că aceste clauze pot fi rezolvate una cu cealaltă – adică se poate aplica regula de rezoluție.
+
+Dacă se găsește o astfel de pereche de literali, se construiește o nouă clauză numită \textit{rezolvent}. Aceasta se formează prin unirea clauzelor \texttt{ci} și \texttt{cj}, eliminând literalul \texttt{lit} și opusul său \texttt{-lit}. Rezultatul este sortat și convertit într-un tuplu pentru consistență.
+
+Dacă rezolventul obținut este clauza vidă (adică o tuplă goală), înseamnă că am găsit o contradicție, deci formula este \textbf{nesatisfiabilă}, iar funcția returnează imediat \texttt{False}.
+
+Dacă nu este clauza vidă, rezolventul este adăugat în mulțimea \texttt{new}, pentru a fi analizat ulterior.
+
+După ce toate perechile de clauze au fost procesate, se verifică dacă mulțimea \texttt{new} conține într-adevăr clauze noi, adică dacă nu este deja inclusă complet în mulțimea clauzelor existente. Dacă nu s-a dedus nimic nou, funcția poate concluziona că nu există nicio contradicție și formula este \textbf{satisfiabilă}, deci returnează \texttt{True}.
+
+În caz contrar, adăugăm toate clauzele noi din \texttt{new} în lista \texttt{clauses}, dar doar dacă nu sunt deja prezente. Apoi ciclul se reia, încercând să genereze noi rezolvente, până când se ajunge la o concluzie.
+
+
+\subsection{Metoda II - Dynamic Programming (DP)}
+\begin{lstlisting}[caption={Implementarea metodei DP pentru satisfiabilitate}]
+def _dp(clauses: CNF) -> tuple[bool, dict[int,bool]]:
+    clauses = [c[:] for c in clauses]
+    assignment: dict[int,bool] = {}
+
+    while clauses:
+        var = abs(clauses[0][0])
+
+        pos = [c for c in clauses if  var in c]
+        neg = [c for c in clauses if -var in c]
+
+        resolvents: list[Clause] = []
+        for c1 in pos:
+            for c2 in neg:
+                new = [lit for lit in c1 if lit != var] + [lit for lit in c2 if lit != -var]
+                if any(l in new and -l in new for l in new):
+                    continue
+                new = list(dict.fromkeys(new))
+                if not new:
+                    return False, {}
+                resolvents.append(new)
+
+        clauses = [c for c in clauses if var not in c and -var not in c]
+        clauses.extend(resolvents)
+
+        if not clauses:
+            return True, assignment
+    return True, assignment
+\end{lstlisting}
+
+Funcția \texttt{\_dp} este o implementare simplificată a metodei de \textbf{programare dinamică} aplicată asupra problemei satisfiabilității. Aceasta primește ca parametru o formulă logică exprimată în CNF (forma conjunctivă normală), sub forma unei liste de clauze.
+
+Semnătura funcției este \texttt{def \_dp(clauses: CNF) -> tuple[bool, dict[int,bool]]:} ceea ce înseamnă că funcția returnează un tuplu cu două elemente: un boolean care indică dacă formula este satisfiabilă și un dicționar ce reprezintă o posibilă atribuire parțială a variabilelor.
+
+La începutul funcției, se face o clonare superficială a listelor de clauze folosind \texttt{[c[:] for c in clauses]}, pentru a evita modificarea listei originale transmise ca parametru. Apoi, este inițializat un dicționar gol numit \texttt{assignment}, care va stoca eventualele atribuiri ale variabilelor, deși în această versiune implementarea nu se concentrează pe completarea sa.
+
+Intrăm într-o buclă \texttt{while clauses}, care continuă atât timp cât mai există clauze de procesat. Această condiție exprimă ideea că încercăm să reducem progresiv problema până când nu mai rămân clauze – ceea ce ar indica satisfiabilitate – sau până când întâlnim o contradicție.
+
+La fiecare iterație, alegem o variabilă care apare în prima clauză (mai exact, luăm valoarea absolută a primului literal din prima clauză), salvând-o în variabila \texttt{var}. Această alegere este simplificată, dar eficientă: alegem o variabilă existentă ca să rezolvăm asupra ei.
+
+Se creează apoi două liste: \texttt{pos}, care conține toate clauzele în care apare literalul \texttt{var} (deci apare pozitiv), și \texttt{neg}, care conține toate clauzele în care apare \texttt{-var} (adică apare negativ).
+
+După aceea, urmează o dublă buclă \texttt{for}, în care sunt combinate toate perechile posibile dintre clauzele din \texttt{pos} și cele din \texttt{neg}. Acesta este pasul de generare a \textit{rezolvenților} – noi clauze obținute aplicând regula de rezoluție asupra literalului \texttt{var}.
+
+Pentru fiecare pereche (\texttt{c1}, \texttt{c2}), se creează o listă \texttt{new} care conține toți literalii din cele două clauze, cu excepția lui \texttt{var} și \texttt{-var}. Astfel, se simulează eliminarea literalului asupra căruia se face rezoluția.
+
+Urmează o verificare importantă: dacă în lista \texttt{new} există o pereche de literal și negația sa (adică o tautologie), atunci acea clauză este întotdeauna adevărată, deci poate fi ignorată. Dacă se detectează această situație, se continuă cu următoarea pereche de clauze.
+
+Dacă clauza nu este tautologică, se elimină duplicatele din listă folosind \texttt{dict.fromkeys(new)} (o tehnică eficientă de eliminare a dublurilor păstrând ordinea) și se verifică dacă lista rezultată este goală. Dacă da, asta înseamnă că s-a generat clauza vidă, deci formula este \textbf{nesatisfiabilă}, iar funcția returnează \texttt{False} și un dicționar gol.
+
+În caz contrar, clauza obținută este adăugată în lista \texttt{resolvents}, care va fi atașată la lista originală de clauze după procesare.
+
+După generarea tuturor rezolvenților, se elimină din formula originală toate clauzele care conțin \texttt{var} sau \texttt{-var}, pentru că acestea tocmai au fost rezolvate. Apoi, lista de clauze este completată cu noile rezolvente.
+
+Dacă, în urma acestei operații, lista \texttt{clauses} a devenit goală, înseamnă că nu mai există nicio restricție – ceea ce implică faptul că formula este \textbf{satisfiabilă}, iar funcția returnează \texttt{True} împreună cu atribuirile parțiale curente (care, în această versiune, sunt încă nepopulate).
+
+Dacă în schimb mai există clauze, ciclul \texttt{while} continuă cu o nouă alegere de variabilă și un nou proces de rezoluție.
+
+Această metodă este eficientă în cazul unor formule de dimensiune mică sau medie și reprezintă o variantă logică, dar simplificată, a algoritmului Davis--Putnam. Spre deosebire de DPLL, nu face \textit{backtracking} și nu explorează explicit spațiul de căutare, ci încearcă să reducă problema prin rezoluții succesive.
+
+
+
+
+
+
+
+
+\subsection{Metoda III - Algoritmul DPLL}
+\begin{lstlisting}[caption={Implementarea completă a algoritmului DPLL}]
+def _unit_propagate(clauses: CNF, assignment: dict[int,bool]) -> tuple[bool,CNF]:
+    changed = True
+    while changed:
+        changed = False
+        unit = None
+        for c in clauses:
+            unassigned = [lit for lit in c if abs(lit) not in assignment]
+            if len(unassigned) == 0:
+                if not any((lit > 0) == assignment.get(abs(lit), False) for lit in c):
+                    return False, clauses
+            elif len(unassigned) == 1:
+                unit = unassigned[0]
+                break
+        if unit is not None:
+            val = unit > 0
+            assignment[abs(unit)] = val
+            new_clauses: CNF = []
+            for c in clauses:
+                if (unit > 0 and unit in c) or (unit < 0 and unit in c):
+                    continue
+                new_c = [lit for lit in c if lit != -unit]
+                new_clauses.append(new_c)
+            clauses = new_clauses
+            changed = True
+    return True, clauses
+
+def _pure_literal_assign(clauses: CNF, assignment: dict[int,bool]) -> CNF:
+    literals = [lit for c in clauses for lit in c]
+    counts: dict[int,int] = defaultdict(int)
+    for lit in literals:
+        counts[lit] += 1
+
+    for lit in list(counts):
+        if -lit in counts:
+            continue
+        if abs(lit) in assignment:
+            continue
+        assignment[abs(lit)] = lit > 0
+        clauses = [c for c in clauses if lit not in c]
+    return clauses
+
+def _dpll(clauses: CNF, assignment: dict[int,bool]) -> bool:
+    ok, clauses = _unit_propagate(clauses, assignment)
+    if not ok:
+        return False
+    clauses = _pure_literal_assign(clauses, assignment)
+    if not clauses:
+        return True
+    lit = clauses[0][0]
+    var = abs(lit)
+    for val in (True, False):
+        if var in assignment:
+            if assignment[var] != val:
+                continue
+        local_assignment = assignment.copy()
+        local_assignment[var] = val
+        new_clauses = []
+        conflict = False
+        for c in clauses:
+            if (val and lit in c) or (not val and -lit in c):
+                continue
+            new_c = [l for l in c if l != (-lit if val else lit)]
+            if not new_c:
+                conflict = True
+                break
+            new_clauses.append(new_c)
+        if not conflict and _dpll(new_clauses, local_assignment):
+            assignment.clear()
+            assignment.update(local_assignment)
+            return True
+    return False
+
+def dpll(clauses: CNF) -> tuple[bool, dict[int,bool]]:
+    assignment: dict[int,bool] = {}
+    sat = _dpll([c[:] for c in clauses], assignment)
+    return sat, assignment
+\end{lstlisting}
+
+Algoritmul \texttt{DPLL} (Davis--Putnam--Logemann--Loveland) este o extensie recursivă a metodei Davis--Putnam, care include tehnici de propagare a unităților și atribuirea literalilor puri pentru a eficientiza căutarea unei soluții. Mai jos explicăm pas cu pas fiecare funcție din implementare.
+
+Funcția \texttt{\_unit\_propagate} are rolul de a aplica propagarea unităților. Se inițializează o variabilă \texttt{changed} cu \texttt{True}, pentru a porni bucla. În interiorul buclei, căutăm clauze care conțin un singur literal neatribuit. Acestea sunt clauze unitare și determină automat valoarea pe care trebuie să o aibă variabila pentru a satisface clauza.
+
+Dacă se găsește o astfel de clauză, se face propagarea: variabila este adăugată în dicționarul de atribuiri, iar clauzele satisfăcute de această variabilă sunt eliminate. Celelalte clauze sunt actualizate prin eliminarea literalului opus (negat), deoarece nu mai poate fi satisfăcut. Procesul se repetă până nu mai există clauze unitare.
+
+Dacă o clauză nu conține niciun literal neatribuit și niciun literal deja satisfăcut, atunci s-a produs un conflict, iar funcția returnează \texttt{False}.
+
+Funcția \texttt{\_pure\_literal\_assign} caută \textit{literalii puri}, adică acei literali care apar doar cu un singur semn (pozitiv sau negativ) în toată formula. Aceștia pot fi atribuiți imediat cu valoarea necesară pentru a satisface toate clauzele în care apar, deoarece nu provoacă contradicții. Clauzele satisfăcute astfel sunt eliminate.
+
+Funcția principală recursivă, \texttt{\_dpll}, începe prin aplicarea propagării unităților. Dacă aceasta returnează \texttt{False}, înseamnă că s-a produs un conflict și se întoarce \texttt{False}. Dacă după propagare și atribuirea literalilor puri nu mai există clauze, înseamnă că formula este satisfiabilă și se întoarce \texttt{True}.
+
+Dacă încă există clauze, se alege un literal (heuristic: primul din prima clauză) și se încearcă recursiv două ramuri: atribuindu-i valoarea \texttt{True} și apoi \texttt{False}. Pentru fiecare alegere, se generează o copie locală a dicționarului de atribuiri și se actualizează clauzele.
+
+În cadrul fiecărei ramuri, se elimină clauzele satisfăcute de literalul ales și se actualizează celelalte, eliminând literalul opus. Dacă în urma unei ramuri toate clauzele pot fi satisfăcute (adică \texttt{\_dpll} returnează \texttt{True}), atunci soluția este găsită, iar atribuirea este salvată.
+
+Funcția \texttt{dpll} este interfața externă care apelează \texttt{\_dpll} cu o copie a formulei originale și un dicționar de atribuiri gol. Returnează dacă formula este satisfiabilă și o atribuire validă a variabilelor.
+
+Prin folosirea acestor trei tehnici – propagarea unităților, atribuirea literalilor puri și backtracking recursiv – algoritmul DPLL reduce semnificativ spațiul de căutare față de o abordare brută.
+
+\section{Elemente secundare}
+Pentru ca întregul sistem de rezolvare a satisfiabilității să funcționeze corect, este nevoie și de câteva componente auxiliare care nu sunt incluse în explicațiile de până acum, dar care sunt esențiale în codul funcțional. Aceste componente asigură atât tipurile necesare pentru claritatea codului, cât și funcționalități de bază pentru colectarea și manipularea datelor.
+
+În primul rând, este important să definim câteva aliasuri de tip, care îmbunătățesc lizibilitatea codului și explicitează structura formulelor booleene:
+
+\begin{itemize}
+  \item \texttt{Literal = int} --- un literal este un număr întreg. Valorile pozitive indică variabile booleene normale, iar valorile negative reprezintă negațiile acestora.
+  \item \texttt{Clause = list[int]} --- o clauză este o listă de literali, reprezentând o disjuncție logică (\texttt{OR}) între aceștia.
+  \item \texttt{CNF = list[Clause]} --- o formulă în forma conjunctivă normală este o listă de clauze, deci o conjuncție (\texttt{AND}) între mai multe disjuncții.
+\end{itemize}
+
+Aceste aliasuri ajută nu doar la documentarea codului, ci și la folosirea corectă a tipurilor în contextul `type hinting` din Python, facilitând întreținerea și extensibilitatea codului.
+
+De asemenea, codul importă câteva module standard:
+
+\begin{itemize}
+  \item \texttt{from collections import defaultdict, deque} --- \texttt{defaultdict} este folosit pentru a crea dicționare care oferă automat o valoare implicită atunci când o cheie nu există. Este util în contorizarea literaliilor, mai ales în funcția \texttt{\_pure\_literal\_assign}. \texttt{deque} (coadă dublă) este o structură de date eficientă pentru operații rapide de adăugare/eliminare la ambele capete. Chiar dacă nu este folosită explicit în funcțiile prezentate anterior, este adesea utilă în implementările extinse, cum ar fi parcurgeri sau gestiuni de sarcini logice.
+  \item \texttt{import sys} --- acest modul oferă acces la parametri și funcționalități ale interpretatorului Python, cum ar fi citirea argumentelor din linia de comandă sau ajustarea recursivității maxime. De exemplu, în codul complet, ar putea fi folosit pentru a permite rularea cu formule mari, prin creșterea limitelor implicite de recursiune.
+  \item \texttt{import typing as \_t} --- folosit pentru a importa unelte de tipizare statică, cum ar fi \texttt{List}, \texttt{Dict}, \texttt{Tuple}, etc., în mod compatibil cu diverse versiuni de Python. Prefixul \texttt{\_t} este o convenție utilă pentru a evita coliziuni de nume și indică faptul că importul este destinat doar pentru tipuri.
+\end{itemize}
+
+Aceste importuri și definiții preliminare nu sunt neapărat parte din algoritm în sine, dar ele sunt indispensabile pentru rularea corectă și completă a programului. În lipsa lor, codul ar genera erori fie de execuție, fie de interpretare a tipurilor.
+
+Pentru ca utilizatorul să poată introduce formule logice într-un format lizibil, mai avem nevoie de o funcție care să transforme expresii textuale în forma internă pe care o folosește programul. Această funcție, responsabilă cu parsarea clauzelor, primește o listă de expresii logice scrise sub formă de șiruri de caractere (de exemplu, ``A v B v ~C``) și le convertește într-o structură de date compatibilă cu algoritmii SAT.
+
+Această conversie presupune identificarea literalilor, tratarea negațiilor (precum \texttt{\textasciitilde A} sau \texttt{!A}), alocarea unui identificator numeric pentru fiecare variabilă, și construirea formulei în formatul CNF așteptat de rezolvatori. În paralel, funcția reține și o mapare între numele variabilelor și identificatorii numerici interni.
+
+Mai avem nevoie și de o funcție care să afișeze într-un mod prietenos rezultatul final — adică o atribuire a variabilelor care face formula satisfiabilă. Aceasta primește dicționarul de atribuire generat de algoritmul DPLL, împreună cu maparea inversă de la ID-uri la numele originale ale variabilelor, și returnează un șir de caractere ușor de citit, de forma ``A=T, B=F, C=T``.
+
+Aceste funcții nu contribuie direct la decizia de satisfiabilitate, dar sunt esențiale pentru interacțiunea cu utilizatorul: una pentru a transforma datele de intrare în formatul intern necesar, iar cealaltă pentru a face interpretabil rezultatul obținut.
+
+
+\section*{Bibliografie}
+
+\begin{enumerate}
+  \item GeeksforGeeks. \textit{Proof that SAT is NP-Complete}. Disponibil online: \url{https://www.geeksforgeeks.org/proof-that-sat-is-np-complete/}
+  
+  \item Worrell, J. \textit{DPLL Algorithm Lecture Notes}, University of Oxford. Disponibil online: \url{https://www.cs.ox.ac.uk/people/james.worrell/lecture06.pdf}
+  
+  \item Junttila, T. \textit{Resolution Method for Propositional Logic}, Aalto University. Disponibil online: \url{https://users.aalto.fi/~tjunttil/2020-DP-AUT/notes-sat/resolution.html}
+  
+  \item Wikipedia. \textit{Davis–Putnam Algorithm}. Disponibil online: \url{https://en.wikipedia.org/wiki/Davis%E2%80%93Putnam_algorithm}
+  
+  \item Wikipedia. \textit{DPLL Algorithm}. Disponibil online: \url{https://en.wikipedia.org/wiki/DPLL_algorithm}
+  
+  \item Biere, A. \textit{SAT Solvers: Techniques and Applications}. In: Handbook of Satisfiability, IOS Press. Disponibil online: \url{https://fmv.jku.at/papers/Biere-HBChapter2009.pdf}
+  
+  \item Marques-Silva, J.,  Sakallah, K. \textit{GRASP: A Search Algorithm for Propositional Satisfiability}. Disponibil online: \url{https://sat.inesc-id.pt/~mikolas/lectures/si2017/papers/GRASP.pdf}
+  
+  \item Malik, S.,  Zhang, L. \textit{Boolean Satisfiability: From Theoretical Hardness to Practical Success}. Comun. ACM, 52(8), 2009. Disponibil online: \url{https://doi.org/10.1145/1536616.1536638}
+\end{enumerate}
